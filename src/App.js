@@ -1,8 +1,17 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import {
+  BrowserRouter as Router,
+  Route,
+  Link,
+  Redirect,
+  Switch
+} from 'react-router-dom';
 
-class App extends React.Component {
-  render() {
-    return (
+
+  //APP COMPONENT
+  const App = () => (
+    <Router>
       <div
         className='ui text container'
       >
@@ -12,24 +21,50 @@ class App extends React.Component {
 
         <ul>
           <li>
-            <a href='/atlantic'>
+            <Link to='/atlantic'>
               <code>/atlantic</code>
-            </a>
+            </Link>
           </li>
           <li>
-            <a href='/pacific'>
+            <Link to='/pacific'>
               <code>/pacific</code>
-            </a>
+            </Link>
+          </li>
+          <li>
+            <Link to='/black-sea'>
+              <code>/black-sea</code>
+            </Link>
           </li>
         </ul>
 
         <hr />
 
-        {/* We'll insert the Route components here */}
+        <Switch>
+          <Route path='/atlantic/ocean' render={() => (
+            <div>
+              <h3>Atlantic Ocean - Again!</h3>
+              <p>Also known as "The Pond."</p>
+            </div>
+          )}/>
+          <Route path='/atlantic' component={Atlantic}/>
+          <Route path='/pacific' component={Pacific}/>
+          <Route path='/black-sea' component={BlackSea}/>
+
+          <Route exact path='/' render={() => (
+            <h3>Welcome! Select a body of saline water above.</h3>
+          )}/>
+
+          <Route render={({location}) => (
+            <div className='ui inverted red segment'>
+              <h3>Error! No matches for <code>{location.pathname}</code></h3>
+            </div>
+          )}/>
+
+        </Switch>
+
       </div>
-    );
-  }
-}
+    </Router>
+  );
 
 const Atlantic = () => (
   <div>
@@ -50,5 +85,43 @@ const Pacific = () => (
     </p>
   </div>
 );
+
+
+class BlackSea extends React.Component {
+
+  state = {
+    counter: 3
+  };
+
+  componentDidMount() {
+    this.interval = setInterval(() => (
+      this.setState(prevState => {
+        return {
+          counter: prevState.counter - 1
+        };
+      })
+    ), 1000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
+  render() {
+    return (
+      <div>
+        <h3>Black Sea</h3>
+        <p>Noting to sea [sic] here ...</p>
+        <p>Redirecting in {this.state.counter}...</p>
+
+        {
+          (this.state.counter < 1 ) ? (
+            <Redirect to='/'/>
+          ) : null
+        }
+      </div>
+    );
+  }
+}
 
 export default App;
